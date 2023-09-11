@@ -1,0 +1,56 @@
+% Generates GP models that will be used in other parts of the work.
+% WARNING: This can take a long time to run
+
+%
+close all;clear all;clc
+
+currentFolder =  pwd;
+parentFolder = fileparts(currentFolder);
+load([parentFolder,'/test.mat'])
+
+
+%% Prepare Data for Training
+
+%Generate list of valid experiments
+
+% Generate list of input space (xObs)
+xObs = [T.C1T,...
+        T.C2T,...
+        T.C1B,...
+        T.C2B,...
+        T.Twist,...
+        T.WallThickness,...
+        log(T.FilamentModulus),...
+        T.Wavelength,...
+        T.Amplitude,...
+        T.WallAngle,...
+        T.TargetMass./T.TargetHeight,...
+        log(T.Stress25),...
+        T.Density,...
+        T.TargetHeight];
+                    
+% Generate output target 1 (yObs)
+yObsKS = T.CriticalEfficiency;
+
+% Generate output target 2 (yObs2)
+modulusAdj = 0.408;
+yObsSigma = log10(T.CriticalStress./(T.FilamentModulus).^modulusAdj); 
+
+
+%% Train Model
+                    
+gprMdlKS = fitrgp(xObs,yObsKS,...
+            'FitMethod','exact',...
+            'BasisFunction', 'constant', ...
+            'KernelFunction', 'ardsquaredexponential',...
+            'Standardize',false);
+        
+                   
+save model_full_KS.mat        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
